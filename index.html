@@ -186,56 +186,38 @@ I confirm that I am responsible for full payment of this bill if not paid by the
 
  <script>
 
-const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbz_sIrC8BiiUfcg-JSizOYDcNFp-UP7asbzcXBSE1BL-6rO0rQvNDt8fQ-sVZw7YGv4/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz_sIrC8BiiUfcg-JSizOYDcNFp-UP7asbzcXBSE1BL-6rO0rQvNDt8fQ-sVZw7YGv4/exec";
 
-cconst params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.search);
 const dsNo = params.get("dsNo");
 
 if (dsNo) {
 
   fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
+    .then(response => response.json())
+    .then(data => {
 
-.then(r=>r.json())
+      if (!data.status) {
+        alert(data.message);
+        return;
+      }
 
-.then(data=>{
+      for (const key in data) {
+        const el = document.getElementById(key);
+        if (el) {
+          el.value = data[key];
+        }
+      }
 
-if(!data.status){
+      calculateAll();
 
-alert(data.message);
-
-return;
-
-}
-
-for(const key in data){
-
-const el=document.getElementById(key);
-
-if(el){
-
-el.value=data[key];
-
-}
-
-}
-
-calculateAll();
-
-})
-
-.catch(err=>{
-
-console.log(err);
-
-alert("Unable to load booking.");
-
-});
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Unable to load booking.");
+    });
 
 }
-
-
-
-
 /* CALCULATIONS */
 function calculateAll(){
   const skm = +starting_km.value || 0;
