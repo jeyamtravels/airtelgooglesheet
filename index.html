@@ -203,11 +203,19 @@ if (dsNo) {
       }
 
       for (const key in data) {
-        const el = document.getElementById(key);
-        if (el) {
-          el.value = data[key];
-        }
-      }
+
+  const el = document.getElementById(key);
+
+  if (!el) continue;
+
+  if (key === "reporting_time") {
+    console.log("Reporting Time:", data[key]);
+    el.value = String(data[key]).trim();
+  } else {
+    el.value = data[key];
+  }
+
+}
 
       calculateAll();
 
