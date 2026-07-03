@@ -221,15 +221,13 @@ if (dsNo) {
         el.value = value;
       }
 
-      calculateAll();
+     calculateAll();
 
-    })
-    .catch(err => {
-      console.log(err);
-      alert("Unable to load booking.");
-    });
-
-}
+})
+.catch(err => {
+    console.log(err);
+    alert("Unable to load booking.");
+});
 
 function calculateAll() {
 
