@@ -191,8 +191,7 @@ const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbzH0230XakiPWV13QmH5v
 const params=new URLSearchParams(window.location.search);
 
 const dsNo = new URLSearchParams(window.location.search).get("dsNo");
-
-if (dsNo) {
+   if (dsNo) {
     fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
 .then(r=>r.json())
 
