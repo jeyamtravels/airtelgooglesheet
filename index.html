@@ -255,13 +255,21 @@ function calculateAll() {
     if (end < start) end += 1440;
 
     const hrs = (end - start) / 60;
+    const days = Math.max(1, Math.ceil(hrs / 24));
 
-    document.getElementById("total_hrs").value = hrs.toFixed(2);
-    document.getElementById("total_days").value = Math.max(1, Math.ceil(hrs / 24));
+    const hrsField = document.getElementById("total_hrs");
+    const daysField = document.getElementById("total_days");
+
+    // AUTO ONLY IF EMPTY (this is the key)
+    if (!hrsField.value) {
+      hrsField.value = hrs.toFixed(2);
+    }
+
+    if (!daysField.value) {
+      daysField.value = days;
+    }
   }
-
 }
-
 ["starting_time","closing_time","starting_km","closing_km"].forEach(id => {
   document.getElementById(id).addEventListener("input", calculateAll);
 });
