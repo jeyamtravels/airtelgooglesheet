@@ -116,7 +116,7 @@ canvas{
 
 <table>
 <tr>
-<td class="w-small"><label>Starting Date</label><input id="starting_date" type="text"></td>
+<td class="w-small"><label>Starting Date</label><input id="starting_date" type="date"></td>
 <td class="w-small"><label>Starting Time</label><input id="starting_time" type="time"></td>
 <td class="w-small"><label>Starting KM</label><input id="starting_km" type="number"></td>
 </tr>
@@ -140,7 +140,7 @@ canvas{
 
 <table>
 <tr>
-<td><label>Reporting Time</label><input id="reporting_time" type="text"></td>
+<td><label>Reporting Time</label><input id="reporting_time" type="time"></td>
 <td><label>Car Booked</label><input id="car_booked"></td>
 <td><label>Car Allotted</label><input id="car_allotted"></td>
 </tr>
@@ -183,90 +183,84 @@ I confirm that I am responsible for full payment of this bill if not paid by the
 
 <button onclick="window.print()">Print Trip Sheet</button>
 </div>
+
  <script>
-<script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxTBg9cVkCRJpGRMcw9KJU2x5ByiRgFBABUceKoYuzPJkDmBpK8mg10Gi9nld9TM7KU/exec";
+const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbxxXfFLSGHnFxBtoMjH41fBqXxp1zmMaooYHtunfNftNc9fS1F-ce1mwzMgvonzm6ya/exec";
 
-const params = new URLSearchParams(window.location.search);
-const dsNo = params.get("dsNo");
+const params=new URLSearchParams(window.location.search);
 
-if (dsNo) {
+const bookingId=params.get("bookingId");
 
-  fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
-    .then(response => response.json())
-    .then(data => {
+if(bookingId){
 
-      if (!data.status) {
-        alert(data.message);
-        return;
-      }
+fetch(`${SCRIPT_URL}?bookingId=${encodeURIComponent(bookingId)}`)
 
-      for (const key in data) {
+.then(r=>r.json())
 
-        const el = document.getElementById(key);
+.then(data=>{
 
-        if (!el) continue;
+if(!data.status){
 
-        let value = data[key] || "";
+alert(data.message);
 
-        if (key === "starting_date") {
-          value = value.replace(/-/g, "/");
-        }
-
-        if (key === "reporting_time") {
-          value = value.trim();
-        }
-
-        el.value = value;
-      }
-
-     calculateAll();
-
-})
-.catch(err => {
-    console.log(err);
-    alert("Unable to load booking.");
-});
-
-function calculateAll() {
-
-  const skm = Number(document.getElementById("starting_km").value);
-  const ckm = Number(document.getElementById("closing_km").value);
-
-  if (!isNaN(skm) && !isNaN(ckm)) {
-    document.getElementById("total_km").value = ckm - skm;
-  } else {
-    document.getElementById("total_km").value = "";
-  }
-
-  const st = document.getElementById("starting_time").value;
-  const ct = document.getElementById("closing_time").value;
-
-  if (st && ct) {
-
-    const [sh, sm] = st.split(":").map(Number);
-    const [ch, cm] = ct.split(":").map(Number);
-
-    let s = sh * 60 + sm;
-    let e = ch * 60 + cm;
-
-    if (e < s) e += 1440;
-
-    const hrs = (e - s) / 60;
-
-    document.getElementById("total_hrs").value = hrs.toFixed(2);
-    document.getElementById("total_days").value = Math.max(1, Math.ceil(hrs / 24));
-
-  }
+return;
 
 }
 
-["starting_time","closing_time","starting_km","closing_km"].forEach(id => {
-  document.getElementById(id).addEventListener("input", calculateAll);
+for(const key in data){
+
+const el=document.getElementById(key);
+
+if(el){
+
+el.value=data[key];
+
+}
+
+}
+
+calculateAll();
+
+})
+
+.catch(err=>{
+
+console.log(err);
+
+alert("Unable to load booking.");
+
 });
 
+}
+
+
+
+
+/* CALCULATIONS */
+function calculateAll(){
+  const skm = +starting_km.value || 0;
+  const ckm = +closing_km.value || 0;
+  if (ckm >= skm) total_km.value = ckm - skm;
+
+  if (starting_time.value && closing_time.value) {
+    const [sh, sm] = starting_time.value.split(":").map(Number);
+    const [ch, cm] = closing_time.value.split(":").map(Number);
+
+    let s = sh*60 + sm;
+    let e = ch*60 + cm;
+    if (e < s) e += 1440;
+
+    const hrs = (e - s) / 60;
+    total_hrs.value = hrs.toFixed(2);
+    total_days.value = Math.max(1, Math.ceil(hrs / 24));
+  }
+}
+
+["starting_time","closing_time","starting_km","closing_km"]
+.forEach(id => document.getElementById(id).addEventListener("input", calculateAll));
 </script>
+
 </body>
 </html>
 
