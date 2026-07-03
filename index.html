@@ -116,7 +116,7 @@ canvas{
 
 <table>
 <tr>
-<td class="w-small"><label>Starting Date</label><input id="starting_date" type="text"></td>
+<td class="w-small"><label>Starting Date</label><input id="starting_date" type="date"></td>
 <td class="w-small"><label>Starting Time</label><input id="starting_time" type="time"></td>
 <td class="w-small"><label>Starting KM</label><input id="starting_km" type="number"></td>
 </tr>
@@ -140,7 +140,7 @@ canvas{
 
 <table>
 <tr>
-<td><label>Reporting Time</label><input id="reporting_time" type="text"></td>
+<td><label>Reporting Time</label><input id="reporting_time" type="time"></td>
 <td><label>Car Booked</label><input id="car_booked"></td>
 <td><label>Car Allotted</label><input id="car_allotted"></td>
 </tr>
@@ -186,7 +186,7 @@ I confirm that I am responsible for full payment of this bill if not paid by the
 
  <script>
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwxaxHEdf23A5-X0KYA94qDsVfih8fWRaVwV4ss8F3epcPj-bFD8xCTgocSEwzx3Ts/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBHKbgOFfFLOcB27XeuYaDCCwKTtsf0exo2v7VFjZtI7ik1dndApCuqaKR8XJgfuGW/exec";
 
 const params = new URLSearchParams(window.location.search);
 const dsNo = params.get("dsNo");
@@ -202,30 +202,33 @@ if (dsNo) {
         return;
       }
 
-      for (const key in data) {
+     for(const key in data){
 
-  const el = document.getElementById(key);
+const el=document.getElementById(key);
 
-  if (!el) continue;
+if(el){
 
-  if (key === "reporting_time") {
-    console.log("Reporting Time:", data[key]);
-    el.value = String(data[key]).trim();
-  } else {
-    el.value = data[key];
-  }
+el.value=data[key];
 
 }
 
-      calculateAll();
+}
 
-    })
-    .catch(err => {
-      console.error(err);
-      alert("Unable to load booking.");
-    });
+calculateAll();
+
+})
+
+.catch(err=>{
+
+console.log(err);
+
+alert("Unable to load booking.");
+
+});
 
 }
+
+
 /* CALCULATIONS */
 function calculateAll(){
   const skm = +starting_km.value || 0;
