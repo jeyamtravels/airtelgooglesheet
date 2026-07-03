@@ -140,7 +140,7 @@ canvas{
 
 <table>
 <tr>
-<td><label>Reporting Time</label><input id="reporting_time" type="time"></td>
+<td><label>Reporting Time</label><input id="reporting_time" type="text" readonly></td>
 <td><label>Car Booked</label><input id="car_booked"></td>
 <td><label>Car Allotted</label><input id="car_allotted"></td>
 </tr>
@@ -205,32 +205,28 @@ return;
 
 }
 
-for(const key in data){
+for (const key in data) {
 
-const el=document.getElementById(key);
+  const el = document.getElementById(key);
 
-if(el){
+  if (!el) continue;
 
-el.value=data[key];
+  if (key === "starting_date") {
+    const d = new Date(data[key]);
 
+    if (!isNaN(d)) {
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+
+      el.value = `${day}-${month}-${year}`;
+    } else {
+      el.value = data[key];
+    }
+  } else {
+    el.value = data[key];
+  }
 }
-
-}
-
-calculateAll();
-
-})
-
-.catch(err=>{
-
-console.log(err);
-
-alert("Unable to load booking.");
-
-});
-
-}
-
 
 
 
