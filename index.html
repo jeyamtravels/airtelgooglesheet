@@ -116,7 +116,7 @@ canvas{
 
 <table>
 <tr>
-<td class="w-small"><label>Starting Date</label><input id="starting_date" type="text" readonly></td>
+<td class="w-small"><label>Starting Date</label><input id="starting_date"type="text" readonly></td>
 <td class="w-small"><label>Starting Time</label><input id="starting_time" type="time"></td>
 <td class="w-small"><label>Starting KM</label><input id="starting_km" type="number"></td>
 </tr>
@@ -140,7 +140,7 @@ canvas{
 
 <table>
 <tr>
-<td><label>Reporting Time</label><input id="reporting_time" type="text" readonly></td>
+<td><label>Reporting Time</label><input id="reporting_time" type="text"readonly></td>
 <td><label>Car Booked</label><input id="car_booked"></td>
 <td><label>Car Allotted</label><input id="car_allotted"></td>
 </tr>
@@ -186,12 +186,9 @@ I confirm that I am responsible for full payment of this bill if not paid by the
 
  <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvvXxjx4VVU53QrV5nxt47u3c2HTH-F6dhErQytJF_4KJYJ0RE9ldQhFebTjFinc-4/exec";
-
 const dsNo = new URLSearchParams(window.location.search).get("dsNo");
-
 if (dsNo) {
-
-  fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
+fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
     .then(response => response.json())
     .then(data => {
 
@@ -202,28 +199,38 @@ if (dsNo) {
 
       for (const key in data) {
 
-        const el = document.getElementById(key);
-        if (!el) continue;
+  const el = document.getElementById(key);
 
-        if (key === "starting_date") {
-          // Date already comes as dd-MM-yyyy from Apps Script
-          el.value = data[key];
-        } else {
-          el.value = data[key];
-        }
+  if (!el) continue;
 
-      }
+  if (key === "starting_date") {
 
+    const d = new Date(data[key]);
+
+    if (!isNaN(d)) {
+
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+
+      el.value = `${day}-${month}-${year}`;
+
+    } else {
+
+      el.value = data[key];
+  }
+  } else {
+    el.value = data[key];
+  }
+}
       calculateAll();
 
-    })
+}) 
     .catch(err => {
       console.error(err);
       alert("Unable to load booking.");
     });
-
 }
-
 /* CALCULATIONS */
 function calculateAll() {
 
@@ -258,8 +265,99 @@ function calculateAll() {
 ["starting_time","closing_time","starting_km","closing_km"].forEach(id => {
   document.getElementById(id).addEventListener("input", calculateAll);
 });
-</script>
+   // ===============================
+// Signature Pad
+// ===============================
 
+function enableSignature(canvasId) {
+
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+  }
+
+  resize();
+  window.addEventListener("resize", resize);
+
+  let drawing = false;
+
+  function getPos(e) {
+
+    const rect = canvas.getBoundingClientRect();
+
+    if (e.touches) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+
+    return {
+      x: e.offsetX,
+      y: e.offsetY
+    };
+
+  }
+
+  function start(e) {
+
+    drawing = true;
+
+    const p = getPos(e);
+
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+
+  }
+
+  function move(e) {
+
+    if (!drawing) return;
+
+    e.preventDefault();
+
+    const p = getPos(e);
+
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+
+  }
+
+  function end() {
+
+    drawing = false;
+
+  }
+
+  canvas.addEventListener("mousedown", start);
+  canvas.addEventListener("mousemove", move);
+  canvas.addEventListener("mouseup", end);
+  canvas.addEventListener("mouseleave", end);
+
+  canvas.addEventListener("touchstart", start);
+  canvas.addEventListener("touchmove", move);
+  canvas.addEventListener("touchend", end);
+
+}
+
+enableSignature("guestSign");
+enableSignature("driverSign");
+   function clearCanvas(id) {
+
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+}
+</script>
+</body>
+</html>
 
 
 
