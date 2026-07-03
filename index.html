@@ -419,8 +419,6 @@ alert("Unable to load booking.");
 });
 
 }
-
-
 /* CALCULATIONS */
 function calculateAll(){
  const skm = Number(starting_km.value);
@@ -462,79 +460,6 @@ if (!isNaN(skm) && !isNaN(ckm)) {
 
 
 
-
-
-
-
-";
-
-const params = new URLSearchParams(window.location.search);
-const dsNo = params.get("dsNo");
-
-if (dsNo) {
-
-  fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
-    .then(response => response.json())
-    .then(data => {
-
-      if (!data.status) {
-        alert(data.message);
-        return;
-      }
-
-     for(const key in data){
-
-const el=document.getElementById(key);
-
-if(el){
-
-el.value=data[key];
-
-}
-
-}
-
-calculateAll();
-
-})
-
-.catch(err=>{
-
-console.log(err);
-
-alert("Unable to load booking.");
-
-});
-
-}
-
-
-/* CALCULATIONS */
-function calculateAll(){
-  const skm = +starting_km.value || 0;
-  const ckm = +closing_km.value || 0;
-  if (ckm >= skm) total_km.value = ckm - skm;
-
-  if (starting_time.value && closing_time.value) {
-    const [sh, sm] = starting_time.value.split(":").map(Number);
-    const [ch, cm] = closing_time.value.split(":").map(Number);
-
-    let s = sh*60 + sm;
-    let e = ch*60 + cm;
-    if (e < s) e += 1440;
-
-    const hrs = (e - s) / 60;
-    total_hrs.value = hrs.toFixed(2);
-    total_days.value = Math.max(1, Math.ceil(hrs / 24));
-  }
-}
-
-["starting_time","closing_time","starting_km","closing_km"]
-.forEach(id => document.getElementById(id).addEventListener("input", calculateAll));
-</script>
-
-</body>
-</html>
 
 
 
