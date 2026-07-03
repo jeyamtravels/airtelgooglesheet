@@ -116,7 +116,7 @@ canvas{
 
 <table>
 <tr>
-<td class="w-small"><label>Starting Date</label><input id="starting_date" type="date"></td>
+<td class="w-small"><label>Starting Date</label><input id="starting_date" type="text"></td>
 <td class="w-small"><label>Starting Time</label><input id="starting_time" type="time"></td>
 <td class="w-small"><label>Starting KM</label><input id="starting_km" type="number"></td>
 </tr>
@@ -140,7 +140,7 @@ canvas{
 
 <table>
 <tr>
-<td><label>Reporting Time</label><input id="reporting_time" type="time"></td>
+<td><label>Reporting Time</label><input id="reporting_time" type="text"></td>
 <td><label>Car Booked</label><input id="car_booked"></td>
 <td><label>Car Allotted</label><input id="car_allotted"></td>
 </tr>
@@ -390,21 +390,25 @@ if (dsNo) {
         return;
       }
 
-     for(const key in data){
+  for (const key in data) {
 
-const el=document.getElementById(key);
+    const el = document.getElementById(key);
 
-if(el){
+    if (!el) continue;
 
-el.value=data[key];
+    let value = data[key] || "";
 
-}
+    if (key === "starting_date") {
+        value = value.replace(/-/g,"/");
+    }
 
+    if (key === "reporting_time") {
+        value = value.trim();
+    }
+el.value = value;
 }
 
 calculateAll();
-
-})
 
 .catch(err=>{
 
@@ -419,9 +423,14 @@ alert("Unable to load booking.");
 
 /* CALCULATIONS */
 function calculateAll(){
-  const skm = +starting_km.value || 0;
-  const ckm = +closing_km.value || 0;
-  if (ckm >= skm) total_km.value = ckm - skm;
+ const skm = Number(starting_km.value);
+const ckm = Number(closing_km.value);
+
+if (!isNaN(skm) && !isNaN(ckm)) {
+    total_km.value = ckm - skm;
+} else {
+    total_km.value = "";
+}
 
   if (starting_time.value && closing_time.value) {
     const [sh, sm] = starting_time.value.split(":").map(Number);
