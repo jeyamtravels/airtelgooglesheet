@@ -185,79 +185,80 @@ I confirm that I am responsible for full payment of this bill if not paid by the
 </div>
 
  <script>
-
-const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbyvvXxjx4VVU53QrV5nxt47u3c2HTH-F6dhErQytJF_4KJYJ0RE9ldQhFebTjFinc-4/exec";
-
-const params=new URLSearchParams(window.location.search);
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvvXxjx4VVU53QrV5nxt47u3c2HTH-F6dhErQytJF_4KJYJ0RE9ldQhFebTjFinc-4/exec";
 
 const dsNo = new URLSearchParams(window.location.search).get("dsNo");
-   if (dsNo) {
-    fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
-.then(r=>r.json())
 
-.then(data=>{
+if (dsNo) {
 
-if(!data.status){
+  fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
+    .then(response => response.json())
+    .then(data => {
 
-alert(data.message);
+      if (!data.status) {
+        alert(data.message);
+        return;
+      }
 
-return;
+      for (const key in data) {
+
+        const el = document.getElementById(key);
+        if (!el) continue;
+
+        if (key === "starting_date") {
+          // Date already comes as dd-MM-yyyy from Apps Script
+          el.value = data[key];
+        } else {
+          el.value = data[key];
+        }
+
+      }
+
+      calculateAll();
+
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Unable to load booking.");
+    });
 
 }
-
-for (const key in data) {
-
-  const el = document.getElementById(key);
-
-  if (!el) continue;
-
-  if (key === "starting_date") {
-    const d = new Date(data[key]);
-
-    if (!isNaN(d)) {
-      const day = String(d.getDate()).padStart(2, "0");
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const year = d.getFullYear();
-
-      el.value = `${day}-${month}-${year}`;
-    } else {
-      el.value = data[key];
-    }
-  } else {
-    el.value = data[key];
-  }
-}
-
-
 
 /* CALCULATIONS */
-function calculateAll(){
-  const skm = +starting_km.value || 0;
-  const ckm = +closing_km.value || 0;
-  if (ckm >= skm) total_km.value = ckm - skm;
+function calculateAll() {
 
-  if (starting_time.value && closing_time.value) {
-    const [sh, sm] = starting_time.value.split(":").map(Number);
-    const [ch, cm] = closing_time.value.split(":").map(Number);
+  const skm = Number(document.getElementById("starting_km").value) || 0;
+  const ckm = Number(document.getElementById("closing_km").value) || 0;
 
-    let s = sh*60 + sm;
-    let e = ch*60 + cm;
-    if (e < s) e += 1440;
-
-    const hrs = (e - s) / 60;
-    total_hrs.value = hrs.toFixed(2);
-    total_days.value = Math.max(1, Math.ceil(hrs / 24));
+  if (ckm >= skm) {
+    document.getElementById("total_km").value = ckm - skm;
   }
+
+  const st = document.getElementById("starting_time").value;
+  const ct = document.getElementById("closing_time").value;
+
+  if (st && ct) {
+
+    const [sh, sm] = st.split(":").map(Number);
+    const [ch, cm] = ct.split(":").map(Number);
+
+    let start = sh * 60 + sm;
+    let end = ch * 60 + cm;
+
+    if (end < start) end += 1440;
+
+    const hrs = (end - start) / 60;
+
+    document.getElementById("total_hrs").value = hrs.toFixed(2);
+    document.getElementById("total_days").value = Math.max(1, Math.ceil(hrs / 24));
+  }
+
 }
 
-["starting_time","closing_time","starting_km","closing_km"]
-.forEach(id => document.getElementById(id).addEventListener("input", calculateAll));
+["starting_time","closing_time","starting_km","closing_km"].forEach(id => {
+  document.getElementById(id).addEventListener("input", calculateAll);
+});
 </script>
-
-</body>
-</html>
-
-
 
 
 
