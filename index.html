@@ -188,13 +188,12 @@ I confirm that I am responsible for full payment of this bill if not paid by the
 
 const SCRIPT_URL ="https://script.google.com/macros/s/AKfycbyhm0bpHfINcuchrjJAR2Htmjvt8WnofIAAasX66n9xG6ucgyV5axh5LVH_5T_FL8d9/exec";
 
-const params=new URLSearchParams(window.location.search);
+cconst params = new URLSearchParams(window.location.search);
+const dsNo = params.get("dsNo");
 
-const bookingId=params.get("bookingId");
+if (dsNo) {
 
-if(bookingId){
-
-fetch(`${SCRIPT_URL}?bookingId=${encodeURIComponent(bookingId)}`)
+  fetch(`${SCRIPT_URL}?dsNo=${encodeURIComponent(dsNo)}`)
 
 .then(r=>r.json())
 
